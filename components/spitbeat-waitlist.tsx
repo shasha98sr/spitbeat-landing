@@ -6,11 +6,9 @@ import { Mic, Share2, Zap, Music } from 'lucide-react'
 export default function SpitbeatWaitlist() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
 
     try {
       const response = await fetch('/api/submit-email', {
@@ -27,10 +25,10 @@ export default function SpitbeatWaitlist() {
         setSubmitted(true)
         setEmail('')
       } else {
-        setError(data.message)
+        // setError(data.message)
       }
-    } catch (error) {
-      setError('An error occurred. Please try again.')
+    } catch {
+      // setError('An error occurred. Please try again.')
     }
   }
 
@@ -89,7 +87,7 @@ export default function SpitbeatWaitlist() {
             <p className="mb-6 text-center text-gray-400">Be the first to experience Spitbeat. Sign up for exclusive early access!</p>
             {submitted ? (
               <div className="bg-green-500 text-black p-4 rounded-lg text-center font-bold">
-                Thanks for signing up! We'll be in touch soon.
+                Thanks for signing up! We&apos;ll be in touch soon.
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
@@ -104,7 +102,6 @@ export default function SpitbeatWaitlist() {
                 <Button type="submit" className="bg-green-500 hover:bg-green-600 text-black font-bold">
                   Join Waitlist
                 </Button>
-                {error && <p className="text-red-500 text-sm text-center">{error}</p>}
               </form>
             )}
           </div>
@@ -117,4 +114,3 @@ export default function SpitbeatWaitlist() {
     </div>
   )
 }
-

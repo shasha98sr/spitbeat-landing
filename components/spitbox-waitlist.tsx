@@ -92,7 +92,7 @@ export default function SpitboxWaitlist() {
             <p className="mb-6 text-center text-gray-400">Be the first to experience Spitbeat. Sign up for exclusive early access!</p>
             {submitted ? (
               <div className="bg-green-500 text-black p-4 rounded-lg text-center font-bold">
-                Thanks for signing up! We'll be in touch soon.
+                Thanks for signing up! We&apos;ll be in touch soon.
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col space-y-4">

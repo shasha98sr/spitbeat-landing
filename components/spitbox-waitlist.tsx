@@ -8,13 +8,33 @@ import { Mic, Share2, Zap, Music } from 'lucide-react'
 export default function SpitboxWaitlist() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send the email to your backend
-    console.log('Submitted email:', email)
-    setSubmitted(true)
-    setEmail('')
+    setError('')
+
+    try {
+      const response = await fetch('/api/submit-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setSubmitted(true)
+        setEmail('')
+      } else {
+        setError(data.message)
+      }
+    } catch (error) {
+      setError('An error occurred. Please try again.')
+      console.error('Error:', error)
+    }
   }
 
   return (
@@ -84,6 +104,7 @@ export default function SpitboxWaitlist() {
                   required
                   className="bg-black border-gray-700 text-white placeholder-gray-500"
                 />
+                {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                 <Button type="submit" className="bg-green-500 hover:bg-green-600 text-black font-bold">
                   Join Waitlist
                 </Button>

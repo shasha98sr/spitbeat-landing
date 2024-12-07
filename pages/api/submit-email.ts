@@ -1,13 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import fs from 'fs'
-import path from 'path'
+  import type { NextApiRequest, NextApiResponse } from 'next'
+import { sql } from '@vercel/postgres'
 
 type Data = {
   success: boolean
   message: string
 }
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
@@ -19,24 +18,20 @@ export default function handler(
         return res.status(400).json({ success: false, message: 'Email is required' })
       }
 
-      // In a real-world scenario, you'd want to validate the email format here
-
-      const filePath = path.join(process.cwd(), 'data', 'emails.json')
-      let emails = []
-
-      if (fs.existsSync(filePath)) {
-        const fileContent = fs.readFileSync(filePath, 'utf-8')
-        emails = JSON.parse(fileContent)
+      // Insert the email into the database
+      try {
+        await sql`
+          INSERT INTO subscribers (email)
+          VALUES (${email})
+        `
+        res.status(200).json({ success: true, message: 'Email submitted successfully' })
+      } catch (error: any) {
+        // Check for unique constraint violation
+        if (error.code === '23505') {
+          return res.status(400).json({ success: false, message: 'Email already registered' })
+        }
+        throw error
       }
-
-      if (emails.includes(email)) {
-        return res.status(400).json({ success: false, message: 'Email already registered' })
-      }
-
-      emails.push(email)
-      fs.writeFileSync(filePath, JSON.stringify(emails, null, 2))
-
-      res.status(200).json({ success: true, message: 'Email submitted successfully' })
     } catch (error) {
       console.error('Error submitting email:', error)
       res.status(500).json({ success: false, message: 'Error submitting email' })
@@ -46,4 +41,3 @@ export default function handler(
     res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
   }
 }
-
